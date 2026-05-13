@@ -10,6 +10,12 @@ Folder-aware path shortening for tmux status bars. *Inspired by [Powerlevel10k](
               long segments → shortest unique prefix among siblings
 ```
 
+## Demo
+
+![tmux-shorten-path in action](demo/demo.gif)
+
+`#{shorten_path}` rendered in `pane-border-format` as the cwd changes, switches between panes, and moves across pre-made windows. See [`demo/`](demo/) for the vhs tape and setup script.
+
 ## Why
 
 Long pane paths chew up the status bar. This plugin shortens them while keeping the *project-relative* part legible:
