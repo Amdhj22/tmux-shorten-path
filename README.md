@@ -131,16 +131,12 @@ Assume `~/myproject/.git` exists (so `~/myproject` is the anchor) and `~/myproje
 | `~/.config/nvim/lua/plugins` (no anchor)              | `~/.c/n/l/plugins`                     |
 | `/usr/local/share/zsh/site-functions` (no anchor)     | `/u/l/s/z/site-functions`              |
 
-## Performance
-
-One `ls`-style glob per middle segment per redraw. With tmux's default `status-interval` (15s) and typical paths (2-3 middle segments), overhead is negligible.
-
-If you have very deep paths in a network mount, consider raising `status-interval`.
-
 ## Requirements
 
 - tmux 3.0+
 - zsh (for the script — does not require zsh as your shell)
+
+> One `ls`-style glob per middle segment per status redraw — negligible on local disks at the default 15s `status-interval`. For deep paths on network mounts, raise `status-interval` to throttle.
 
 ## License
 

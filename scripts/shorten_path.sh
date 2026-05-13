@@ -1,44 +1,13 @@
 #!/usr/bin/env zsh
-# tmux-shorten-path: p10k-style path shortening for tmux status bars.
+# Print a shortened form of an absolute path. See README for the behaviour
+# of each strategy.
 #
-# Strategies (SHORTEN_PATH_STRATEGY):
-#
-#   truncate_to_unique  [default]
-#     Walks the path from root and locates the SHALLOWEST directory that
-#     contains a marker file (.git, go.mod, package.json, etc.). That dir
-#     is the "anchor". HOME and its ancestors are never anchors.
-#       - Components BEFORE the anchor → 1 char (2 for hidden).
-#       - The anchor                   → kept full.
-#       - Components AFTER the anchor  → shortest unique prefix among
-#                                        sibling entries + "..", but only
-#                                        if length exceeds SEG_THRESHOLD.
-#       - Last (current) component     → kept full.
-#       - Without any anchor, only the last component is kept full.
-#
-#   truncate_from_right
-#     Every non-last component is truncated to SHORTEN_PATH_SEG_LENGTH chars
-#     (default 1). Hidden dirs get +1 char. No anchor logic.
-#
-#   truncate_to_last
-#     Only the last (basename) component is shown.
-#
-#   none
-#     Path is returned as-is, with $HOME collapsed to ~.
-#
-# Common behavior across strategies:
-#   - $HOME is collapsed to ~.
-#
-# Usage:
-#   shorten_path.sh /Users/foo/projects/bar/src/api
-#
-# Env vars:
-#   SHORTEN_PATH_STRATEGY       — strategy name (see above). Default: truncate_to_unique
-#   SHORTEN_PATH_MARKERS        — space-separated marker filenames
-#                                  (truncate_to_unique only)
-#   SHORTEN_PATH_SEG_THRESHOLD  — only truncate when len > N (default 5)
-#                                  (truncate_to_unique only)
-#   SHORTEN_PATH_SEG_LENGTH     — chars to keep per non-last segment (default 1)
-#                                  (truncate_from_right only)
+# Env:
+#   SHORTEN_PATH_STRATEGY        truncate_to_unique | truncate_from_right
+#                                 | truncate_to_last | none
+#   SHORTEN_PATH_SEG_THRESHOLD   only truncate when len > N  (default 5)
+#   SHORTEN_PATH_SEG_LENGTH      chars per non-last segment  (default 1)
+#   SHORTEN_PATH_MARKERS         space-separated marker filenames
 
 emulate -L zsh
 setopt no_unset
@@ -167,18 +136,12 @@ _unique_prefix() {
   sibs=("$parent"/*(N:t) "$parent"/.*(N:t))
   for ((plen = 1; plen < seg_len; plen++)); do
     pfx="${seg:0:$plen}"
-    local conflict=0
+    local unique=1
     for sib in $sibs; do
       [[ "$sib" == "$seg" || "$sib" == "." || "$sib" == ".." ]] && continue
-      if [[ "$sib" == "$pfx"* ]]; then
-        conflict=1
-        break
-      fi
+      if [[ "$sib" == "$pfx"* ]]; then unique=0; break; fi
     done
-    if (( ! conflict )); then
-      print -r -- "${pfx}.."
-      return
-    fi
+    (( unique )) && { print -r -- "${pfx}.."; return; }
   done
   print -r -- "$seg"
 }
