@@ -1,0 +1,10 @@
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Internal working notes — not part of the published plugin.
+SPEC.md
+CONTEXT.md
