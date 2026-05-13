@@ -1,5 +1,10 @@
 # tmux-shorten-path
 
+[![Latest release](https://img.shields.io/github/v/release/Amdhj22/tmux-shorten-path?sort=semver)](https://github.com/Amdhj22/tmux-shorten-path/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![tmux 3.0+](https://img.shields.io/badge/tmux-3.0%2B-1bb91f)](https://github.com/tmux/tmux)
+[![macOS · Linux](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey)](#requirements)
+
 Folder-aware path shortening for tmux status bars. *Inspired by [Powerlevel10k](https://github.com/romkatv/powerlevel10k).*
 
 ```
