@@ -1,23 +1,23 @@
 # tmux-shorten-path
 
-p10k-style path shortening for tmux status bars — folder marker anchors + `truncate_to_unique`.
+Folder-aware path shortening for tmux status bars. *Inspired by [Powerlevel10k](https://github.com/romkatv/powerlevel10k).*
 
 ```
-/Users/foo/dotfiles/config/nvim/playground/asdfads
+/Users/johndoe/myproject/server/api/middleware/auth.go
                   ↓
-~/dotfiles/c../nvim/pla../asdfads
-   anchor↑     ↑     ↑
+~/myproject/s../api/mid../auth.go
+   anchor↑    ↑       ↑
               long segments → shortest unique prefix among siblings
 ```
 
 ## Why
 
-Powerlevel10k displays current path with two clever rules:
+Long pane paths chew up the status bar. This plugin shortens them while keeping the *project-relative* part legible:
 
 1. **Folder anchors** — when a directory contains `.git`, `package.json`, `go.mod`, etc., the path *from that directory onwards* is kept full (so you always see where you are inside the project).
-2. **`truncate_to_unique`** — segments before/around the anchor are shortened to the shortest prefix that doesn't collide with sibling directories, so `playground` becomes `pla..` only if `plugin` exists alongside it; otherwise just `p..`.
+2. **Unique prefix truncation** — segments before/around the anchor are shortened to the shortest prefix that doesn't collide with sibling directories, so `middleware` becomes `mid..` only if `migrations` exists alongside it; otherwise just `m..`.
 
-tmux has no built-in equivalent. This plugin brings the same logic to your status line.
+tmux has no built-in equivalent.
 
 ## Install
 
@@ -86,13 +86,13 @@ All strategies collapse `$HOME` to `~`.
 Same path, different strategies:
 
 ```
-input: ~/dotfiles/config/nvim/playground/asdfads
+input: ~/myproject/server/api/middleware/auth.go
 
-truncate_to_unique     →  ~/dotfiles/c../nvim/pla../asdfads
-truncate_from_right    →  ~/d/c/n/p/asdfads
-truncate_from_right    →  ~/do/co/nv/pl/asdfads   (seg_length=2)
-truncate_to_last       →  asdfads
-none                   →  ~/dotfiles/config/nvim/playground/asdfads
+truncate_to_unique     →  ~/myproject/s../api/mid../auth.go
+truncate_from_right    →  ~/m/s/a/m/auth.go
+truncate_from_right    →  ~/my/se/ap/mi/auth.go   (seg_length=2)
+truncate_to_last       →  auth.go
+none                   →  ~/myproject/server/api/middleware/auth.go
 ```
 
 ## How it works (truncate_to_unique)
@@ -108,15 +108,15 @@ The algorithm runs on every status redraw:
 
 ## Examples
 
-Assume `~/dotfiles/.git` exists (so `~/dotfiles` is the anchor) and `~/dotfiles/config/nvim/` contains both `playground/` and `plugin/`:
+Assume `~/myproject/.git` exists (so `~/myproject` is the anchor) and `~/myproject/server/api/` contains both `middleware/` and `migrations/`:
 
 | Full path                                             | Shortened (`truncate_to_unique`)       |
 | ----------------------------------------------------- | -------------------------------------- |
-| `~/dotfiles`                                          | `~/dotfiles`                           |
-| `~/dotfiles/bin`                                      | `~/dotfiles/bin`                       |
-| `~/dotfiles/config/ghostty`                           | `~/dotfiles/c../ghostty`               |
-| `~/dotfiles/config/nvim`                              | `~/dotfiles/c../nvim`                  |
-| `~/dotfiles/config/nvim/playground/asdfads`           | `~/dotfiles/c../nvim/pla../asdfads`    |
+| `~/myproject`                                         | `~/myproject`                          |
+| `~/myproject/bin`                                     | `~/myproject/bin`                      |
+| `~/myproject/server/db`                               | `~/myproject/s../db`                   |
+| `~/myproject/server/api`                              | `~/myproject/s../api`                  |
+| `~/myproject/server/api/middleware/auth.go`           | `~/myproject/s../api/mid../auth.go`    |
 | `~/.config/nvim/lua/plugins` (no anchor)              | `~/.c/n/l/plugins`                     |
 | `/usr/local/share/zsh/site-functions` (no anchor)     | `/u/l/s/z/site-functions`              |
 
